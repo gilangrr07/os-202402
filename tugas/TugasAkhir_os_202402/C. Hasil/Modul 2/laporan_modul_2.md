@@ -43,7 +43,7 @@ Parent selesai
 ## 📷 screenshot:
 
 
-![hasil ptest](./screenshots/cowtest_output.png)
+![hasil ptest](./Screenshoot/Output_Modul2.png)
 
 
 ---
