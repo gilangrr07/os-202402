@@ -52,7 +52,7 @@ screenshot:
 
 ```
 
-![Hasil ptest dan rtest](https://github.com/gilangrr07/os-202402/blob/main/tugas/TugasAkhir_os_202402/C.%20Hasil/Modul%201/Screenshoot/Output_Modul1.png?raw=true)
+https://github.com/gilangrr07/os-202402/blob/46233ccbb660e13f6824038bd5b223e734bafac3/tugas/TugasAkhir_os_202402/C.%20Hasil/Modul%201/Screenshoot/Output_Modul1.png
 
 ```
 
