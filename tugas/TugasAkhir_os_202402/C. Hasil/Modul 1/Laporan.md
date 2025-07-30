@@ -31,7 +31,7 @@
 * `rtest`: untuk menguji `getReadCount()`
 ## 📷 Hasil Uji
 
-### 📍 Contoh Output `ptest`:
+### 📍 Output `ptest`:
 
 ```
 $ ptest
@@ -52,7 +52,7 @@ screenshot:
 
 ```
 
-![hasil ptest dan rtest](./screenshots/Output_Modul1.png)
+![Hasil Uji Modul 1](./Screenshoot/Output_Modul1.png)
 
 ```
 
