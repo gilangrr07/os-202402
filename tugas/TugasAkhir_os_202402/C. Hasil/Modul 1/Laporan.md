@@ -48,11 +48,11 @@ Read Count Setelah: 0
 ```
 
 
-Jika ada screenshot:
+screenshot:
 
 ```
 
-<img width="806" height="302" alt="Ouput_Modul1" src="https://github.com/user-attachments/assets/a9bd1da8-3796-4fbf-a461-2835f3af3493" />
+![hasil ptest dan rtest](./screenshots/Output_Modul1.png)
 
 ```
 
