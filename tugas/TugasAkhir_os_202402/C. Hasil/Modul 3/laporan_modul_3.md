@@ -2,10 +2,10 @@
 
 **Mata Kuliah**: Sistem Operasi
 **Semester**: Genap / Tahun Ajaran 2024–2025
-**Nama**: `<Nama Lengkap>`
-**NIM**: `<Nomor Induk Mahasiswa>`
+**Nama**: `Mohamad Gilang Rizki Riomdona`
+**NIM**: `240202903`
 **Modul yang Dikerjakan**:
-`(Contoh: Modul 1 – System Call dan Instrumentasi Kernel)`
+`(Modul 3 - Manajemen Memori Tingkat Lanjut (Copy-on-Write & Shared Memory))`
 
 ---
 
@@ -13,65 +13,58 @@
 
 Tuliskan deskripsi singkat dari modul yang Anda kerjakan. Misalnya:
 
-* **Modul 1 – System Call dan Instrumentasi Kernel**:
-  Menambahkan dua system call baru, yaitu `getpinfo()` untuk melihat proses yang aktif dan `getReadCount()` untuk menghitung jumlah pemanggilan `read()` sejak boot.
+**Modul 3 – Manajemen Memori Tingkat Lanjut (Copy-on-Write & Shared Memory)**:
+ Modul ini berfokus pada pengembangan manajemen memori di kernel xv6 melalui dua fitur utama:
+* Copy-on-Write Fork (CoW): Optimalisasi `fork()` dengan menunda duplikasi halaman memori hingga proses melakukan penulisan.
+* Shared Memory: Mekanisme berbagi memori antar proses menggunakan `API shmget(int key)` dan `shmrelease(int key)`, menyerupai model System V Shared Memory.
 ---
 
 ## 🛠️ Rincian Implementasi
 
-Tuliskan secara ringkas namun jelas apa yang Anda lakukan:
+### Copy-on-Write Fork:
 
-### Contoh untuk Modul 1:
+* Menambahkan array `ref_count[]` untuk menghitung referensi setiap halaman fisik `(vm.c)`
+* Membuat fungsi `incref()` dan `decref()` untuk manajemen reference count
+* Menambahkan flag `PTE_COW` di `mmu.h`
+* Mengganti `copyuvm()` dengan `cowuvm()` di `fork()` `(proc.c)`
+* Memodifikasi `trap()` di `trap.c` untuk menangani page fault akibat write pada halaman CoW
+* Menyisipkan mekanisme `memmove()` dan `kalloc()` pada saat CoW-triggered fault
 
-* Menambahkan dua system call baru di file `sysproc.c` dan `syscall.c`
-* Mengedit `user.h`, `usys.S`, dan `syscall.h` untuk mendaftarkan syscall
-* Menambahkan struktur `struct pinfo` di `proc.h`
-* Menambahkan counter `readcount` di kernel
-* Membuat dua program uji: `ptest.c` dan `rtest.c`
+### Shared Memory:
+* Menambahkan struktur `shmtab[]` untuk menyimpan data `shared memory` `(vm.c)`
+* Mengimplementasikan `syscall` `shmget(int key)` dan `shmrelease(int key)` di `sysproc.c`
+* Mendaftarkan `syscall` pada `syscall.c`, `syscall.h`, `user.h`, dan `usys.S`
+* Melakukan mapping shared memory di alamat user `(USERTOP - n*PGSIZE)`
+  
 ---
 
 ## ✅ Uji Fungsionalitas
 
-Tuliskan program uji apa saja yang Anda gunakan, misalnya:
-
-* `ptest`: untuk menguji `getpinfo()`
-* `rtest`: untuk menguji `getReadCount()`
-* `cowtest`: untuk menguji fork dengan Copy-on-Write
-* `shmtest`: untuk menguji `shmget()` dan `shmrelease()`
-* `chmodtest`: untuk memastikan file `read-only` tidak bisa ditulis
-* `audit`: untuk melihat isi log system call (jika dijalankan oleh PID 1)
-
+* `cowtest`: menguji apakah proses anak membuat salinan hanya saat menulis ke memori (lazy copy)
+* `shmtest`: menguji proses anak dan induk dapat mengakses halaman shared memory yang sama menggunakan key
 ---
 
 ## 📷 Hasil Uji
 
-Lampirkan hasil uji berupa screenshot atau output terminal. Contoh:
-
-### 📍 Contoh Output `cowtest`:
+Output `cowtest`:
 
 ```
 Child sees: Y
 Parent sees: X
 ```
 
-### 📍 Contoh Output `shmtest`:
+Contoh Output `shmtest`:
 
 ```
 Child reads: A
 Parent reads: B
 ```
 
-### 📍 Contoh Output `chmodtest`:
+## 📷 screenshot:
 
-```
-Write blocked as expected
-```
 
-Jika ada screenshot:
+![hasil cowtest dan shmtest](./Screenshoot/Output_Modul3.png)
 
-```
-![hasil cowtest](./screenshots/cowtest_output.png)
-```
 
 ---
 
@@ -79,15 +72,13 @@ Jika ada screenshot:
 
 Tuliskan kendala (jika ada), misalnya:
 
-* Salah implementasi `page fault` menyebabkan panic
-* Salah memetakan alamat shared memory ke USERTOP
-* Proses biasa bisa akses audit log (belum ada validasi PID)
+* Kernel panic saat terjadi page fault karena handler tidak memeriksa apakah halaman yang diakses memiliki flag PTE_COW, sehingga proses langsung dibunuh.
+* Lupa memodifikasi flag halaman menjadi PTE_COW di cowuvm(), sehingga mekanisme Copy-on-Write tidak berjalan dan fork tetap melakukan duplikasi memori seperti biasa.
+* Shared memory tidak sinkron antara proses parent dan child karena setiap proses memetakan halaman ke alamat virtual yang berbeda-beda.
 
 ---
 
 ## 📚 Referensi
-
-Tuliskan sumber referensi yang Anda gunakan, misalnya:
 
 * Buku xv6 MIT: [https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf](https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf)
 * Repositori xv6-public: [https://github.com/mit-pdos/xv6-public](https://github.com/mit-pdos/xv6-public)
