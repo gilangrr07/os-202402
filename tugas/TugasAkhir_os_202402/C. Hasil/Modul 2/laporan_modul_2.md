@@ -2,92 +2,59 @@
 
 **Mata Kuliah**: Sistem Operasi
 **Semester**: Genap / Tahun Ajaran 2024–2025
-**Nama**: `<Nama Lengkap>`
-**NIM**: `<Nomor Induk Mahasiswa>`
+**Nama**: Mohamad Gilang Rizki Riomdona
+**NIM**: 240202903
 **Modul yang Dikerjakan**:
-`(Contoh: Modul 1 – System Call dan Instrumentasi Kernel)`
+(Modul 2 – Penjadwalan CPU Lanjutan (Priority Scheduling Non-Preemptive))
 
 ---
 
 ## 📌 Deskripsi Singkat Tugas
-
-Tuliskan deskripsi singkat dari modul yang Anda kerjakan. Misalnya:
-
-* **Modul 1 – System Call dan Instrumentasi Kernel**:
-  Menambahkan dua system call baru, yaitu `getpinfo()` untuk melihat proses yang aktif dan `getReadCount()` untuk menghitung jumlah pemanggilan `read()` sejak boot.
+* **Modul 2 – Penjadwalan CPU Lanjutan (Priority Scheduling Non-Preemptive)**:
+memodifikasi algoritma penjadwalan proses pada kernel xv6 dari yang semula menggunakan Round Robin menjadi Non-Preemptive Priority Scheduling. Dalam implementasinya, setiap proses diberikan sebuah nilai prioritas. Scheduler akan selalu memilih proses RUNNABLE dengan prioritas tertinggi (nilai numerik paling kecil) untuk dijalankan, tanpa adanya preemption.
 ---
 
 ## 🛠️ Rincian Implementasi
 
-Tuliskan secara ringkas namun jelas apa yang Anda lakukan:
-
-### Contoh untuk Modul 1:
-
-* Menambahkan dua system call baru di file `sysproc.c` dan `syscall.c`
-* Mengedit `user.h`, `usys.S`, dan `syscall.h` untuk mendaftarkan syscall
-* Menambahkan struktur `struct pinfo` di `proc.h`
-* Menambahkan counter `readcount` di kernel
-* Membuat dua program uji: `ptest.c` dan `rtest.c`
+* Menambahkan field priority ke dalam `struct proc` di `proc.h`
+* Menginisialisasi nilai default priority pada `allocproc()` di `proc.c`
+* Membuat system call baru `set_priority(int)` melalui modifikasi file:
+  * `syscall.h`, `user.h`, `usys.S`, `syscall.c`, `ysproc.c`
+* Menambahkan program pengujian `ptest.c` untuk menguji perilaku scheduling
+* Menambahkan `_ptest` ke dalam `Makefile` agar program uji bisa dikompilasi dan dijalankan
 ---
 
 ## ✅ Uji Fungsionalitas
 
 Tuliskan program uji apa saja yang Anda gunakan, misalnya:
 
-* `ptest`: untuk menguji `getpinfo()`
-* `rtest`: untuk menguji `getReadCount()`
-* `cowtest`: untuk menguji fork dengan Copy-on-Write
-* `shmtest`: untuk menguji `shmget()` dan `shmrelease()`
-* `chmodtest`: untuk memastikan file `read-only` tidak bisa ditulis
-* `audit`: untuk melihat isi log system call (jika dijalankan oleh PID 1)
+* `ptest`: menguji urutan eksekusi proses berdasarkan nilai prioritas masing-masing proses
 
 ---
 
 ## 📷 Hasil Uji
 
-Lampirkan hasil uji berupa screenshot atau output terminal. Contoh:
-
-### 📍 Contoh Output `cowtest`:
-
 ```
-Child sees: Y
-Parent sees: X
+Child 2 selesai
+Child 1 selesai
+Parent selesai
 ```
 
-### 📍 Contoh Output `shmtest`:
+## 📷 screenshot:
 
-```
-Child reads: A
-Parent reads: B
-```
 
-### 📍 Contoh Output `chmodtest`:
+![hasil ptest](./screenshots/cowtest_output.png)
 
-```
-Write blocked as expected
-```
-
-Jika ada screenshot:
-
-```
-![hasil cowtest](./screenshots/cowtest_output.png)
-```
 
 ---
 
 ## ⚠️ Kendala yang Dihadapi
 
-Tuliskan kendala (jika ada), misalnya:
-
-* Salah implementasi `page fault` menyebabkan panic
-* Salah memetakan alamat shared memory ke USERTOP
-* Proses biasa bisa akses audit log (belum ada validasi PID)
-
+* Awalnya lupa menginisialisasi `priority` dalam `allocproc()`, menyebabkan nilai prioritas tidak terdefinisi
+* Penamaan `syscall set_priority` sempat tidak dikenali karena lupa menambahkan ke `usys.S`
 ---
 
 ## 📚 Referensi
-
-Tuliskan sumber referensi yang Anda gunakan, misalnya:
 
 * Buku xv6 MIT: [https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf](https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf)
 * Repositori xv6-public: [https://github.com/mit-pdos/xv6-public](https://github.com/mit-pdos/xv6-public)
