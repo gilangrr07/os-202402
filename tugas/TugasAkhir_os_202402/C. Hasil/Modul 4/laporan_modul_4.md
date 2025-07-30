@@ -5,73 +5,68 @@
 **Nama**: `Mohamad Gilang Rizki Riomdona`
 **NIM**: `240202903`
 **Modul yang Dikerjakan**:
-`()`
+`(Modul 4 – Subsistem Kernel Alternatif (xv6-public))`
 
 ---
 
 ## 📌 Deskripsi Singkat Tugas
 
-Tuliskan deskripsi singkat dari modul yang Anda kerjakan. Misalnya:
-
-* **Modul 1 – System Call dan Instrumentasi Kernel**:
-  Menambahkan dua system call baru, yaitu `getpinfo()` untuk melihat proses yang aktif dan `getReadCount()` untuk menghitung jumlah pemanggilan `read()` sejak boot.
+**Modul 4 – Subsistem Kernel Alternatif**:
+  
+  Mengimplementasi dua fitur pada kernel xv6:
+  * Menambahkan `system call baru` `chmod()` untuk mengatur mode file `(read-only atau read-write)`
+  * Menambahkan `Driver pseudo-device` /`dev`/`random` yang dapat menghasilkan byte acak saat diakses melalui `read()`.
 ---
 
 ## 🛠️ Rincian Implementasi
 
-Tuliskan secara ringkas namun jelas apa yang Anda lakukan:
+### System Call chmod:
 
-### Contoh untuk Modul 1:
+* Menambahkan `field mode` pada `struct inode` di `fs.h` untuk menandai apakah file bersifat `read-write` (mode=0) atau `read-only` (mode=1).
+* Menambahkan `syscall chmod()`:
+  * Nomor syscall baru di `syscall.h`.
+  * Deklarasi di `user.h`.
+  * Entry `syscall` di `usys.S`.
+  * Registrasi `syscall` di `syscall.c`.
+  * Implementasi fungsi `sys_chmod()` di `sysfile.c`, menggunakan `ilock()` untuk mengatur `ip->mode`.
+* Menambahkan validasi di `file.c`, pada `filewrite()`, untuk memblokir operasi `write()` apabila `inode` dalam mode `read-only`.
+* Membuat program uji `chmodtest.c` untuk memastikan `write()` diblokir saat file dalam mode read-only.
 
-* Menambahkan dua system call baru di file `sysproc.c` dan `syscall.c`
-* Mengedit `user.h`, `usys.S`, dan `syscall.h` untuk mendaftarkan syscall
-* Menambahkan struktur `struct pinfo` di `proc.h`
-* Menambahkan counter `readcount` di kernel
-* Membuat dua program uji: `ptest.c` dan `rtest.c`
+###  Device random:
+
+* Menambahkan file baru `random.c` berisi implementasi fungsi `randomread()`, generator angka pseudo-acak menggunakan linear congruential generator.
+* Mendaftarkan `driver pseudo-device` ke `devsw[]` di `file.c`.
+* Menambahkan entry untuk membuat node device di `init.c`.
+* Menambahkan program uji `randomtest.c` untuk membaca 8 byte dari /dev/random dan mencetak hasilnya.
+  
+
 ---
 
 ## ✅ Uji Fungsionalitas
 
-Tuliskan program uji apa saja yang Anda gunakan, misalnya:
-
-* `ptest`: untuk menguji `getpinfo()`
-* `rtest`: untuk menguji `getReadCount()`
-* `cowtest`: untuk menguji fork dengan Copy-on-Write
-* `shmtest`: untuk menguji `shmget()` dan `shmrelease()`
-* `chmodtest`: untuk memastikan file `read-only` tidak bisa ditulis
-* `audit`: untuk melihat isi log system call (jika dijalankan oleh PID 1)
+* `chmodtest`: Menguji apakah file dengan mode read-only tidak bisa ditulis.
+* `randomtest`: Menguji pembacaan dari /dev/random sebanyak 8 byte.
 
 ---
 
 ## 📷 Hasil Uji
 
-Lampirkan hasil uji berupa screenshot atau output terminal. Contoh:
-
-### 📍 Contoh Output `cowtest`:
-
-```
-Child sees: Y
-Parent sees: X
-```
-
-### 📍 Contoh Output `shmtest`:
-
-```
-Child reads: A
-Parent reads: B
-```
-
-### 📍 Contoh Output `chmodtest`:
+### 📍 Output `chmodtest`:
 
 ```
 Write blocked as expected
 ```
+### 📍Output `randomtest`:
+
+```
+159 114 41 116 67 198 109 232
+```
 
 Jika ada screenshot:
 
-```
-![hasil cowtest](./screenshots/cowtest_output.png)
-```
+
+![hasil chmodtest dan randomtest](./Screenshoot/Output_Modul4.png)
+
 
 ---
 
@@ -79,15 +74,13 @@ Jika ada screenshot:
 
 Tuliskan kendala (jika ada), misalnya:
 
-* Salah implementasi `page fault` menyebabkan panic
-* Salah memetakan alamat shared memory ke USERTOP
-* Proses biasa bisa akses audit log (belum ada validasi PID)
+* Salah penepatan `short mode;`,`short mode;` Seharusnya berada di `file.h` bukan di `fs.h`.
+* Saat register `pseudo-device /dev/random`, sempat lupa menambahkan deklarasi extern untuk `randomread()` di `file.c`, sehingga muncul error saat linking.
+* `Device node /dev/random` tidak muncul saat boot karena `mknod()` belum dipanggil di `init.c`, menyebabkan `open("/dev/random", 0)` gagal.
 
 ---
 
 ## 📚 Referensi
-
-Tuliskan sumber referensi yang Anda gunakan, misalnya:
 
 * Buku xv6 MIT: [https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf](https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf)
 * Repositori xv6-public: [https://github.com/mit-pdos/xv6-public](https://github.com/mit-pdos/xv6-public)
