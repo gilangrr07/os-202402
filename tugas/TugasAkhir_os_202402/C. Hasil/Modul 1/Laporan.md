@@ -52,7 +52,7 @@ screenshot:
 
 ```
 
-![Hasil Uji Modul 1](./Screenshoot/Output_Modul1.png)
+![hasil ptest dan rtest](./Screenshoot/Output_Modul1.png)
 
 ```
 
